@@ -10,8 +10,9 @@ namespace MyApp
     internal class Task : IItem
     {
         private string content;
-        private DateTime dueDate, expTime;
-        public Task(string content, DateTime dueDate, DateTime expTime) : base()
+        private DateTime dueDate;
+        private TimeSpan expTime;
+        public Task(string content, DateTime dueDate, TimeSpan expTime) : base()
         {
             this.content = content;
             this.dueDate = dueDate;
@@ -36,7 +37,7 @@ namespace MyApp
 
         public string Content { get { return content; }  set { content = value; } }
         public DateTime DueDate { get { return dueDate; } set { dueDate = value; } }
-        public DateTime ExpTime { get { return expTime; } set { expTime = value; } }
+        public TimeSpan ExpTime { get { return expTime; } set { expTime = value; } }
         public long Id { get { return id; } }
     }
 }
