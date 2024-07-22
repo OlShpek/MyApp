@@ -3,41 +3,47 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
+using System.Xml.Linq;
 
 namespace MyApp
 {
     internal class Task : IItem
     {
-        private string content;
-        private DateTime dueDate;
-        private TimeSpan expTime;
-        public Task(string content, DateTime dueDate, TimeSpan expTime) : base()
+        string content;
+        DateTime dueDate;
+        TimeSpan expTime;
+        bool completed;
+        public Task(string content, DateTime dueDate, TimeSpan expTime, string tagName) : base(tagName)
         {
             this.content = content;
             this.dueDate = dueDate;
             this.expTime = expTime;
+            completed = false;
         }
 
-        public bool is_overdue()
+        public bool IsOverdue()
         {
             return DateTime.Now < dueDate;
         }
 
-        public override XmlElement getXml()
+        public override XElement GetXml()
         {
-            XmlDocument doc = new XmlDocument();
-            XmlElement el = doc.CreateElement("task");
-            el.SetAttribute("id", id.ToString());
-            el.SetAttribute("content", content);
-            el.SetAttribute("dueDate", dueDate.ToString());
-            el.SetAttribute("expTime", expTime.ToString());
+            XElement el = new XElement(tagName);
+            el.SetAttributeValue("id", id);
+            el.SetAttributeValue("content", content);
+            el.SetAttributeValue("dueDate", dueDate.ToString());
+            el.SetAttributeValue("expTime", expTime.ToString());
+            el.SetAttributeValue("completed", completed.ToString());
             return el;
         }
 
+        public void ChangeComp()
+        {
+            completed = !completed;
+        }
         public string Content { get { return content; }  set { content = value; } }
         public DateTime DueDate { get { return dueDate; } set { dueDate = value; } }
         public TimeSpan ExpTime { get { return expTime; } set { expTime = value; } }
-        public long Id { get { return id; } }
+        public bool Completed { get { return completed; } }
     }
 }

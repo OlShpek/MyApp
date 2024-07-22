@@ -3,25 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
+using System.Xml.Linq;
 
 namespace MyApp
 {
     internal abstract class IItem
     {
-        protected long id;
+        protected string id;
+        protected string tagName;
 
-        protected IItem()
+        protected IItem(string tagName)
         {
-            set_id();
+            this.tagName = tagName;
+            SetId();
         }
-        protected void set_id()
+        protected void SetId()
         {
-            TimeSpan sec = DateTime.Now.Subtract(new DateTime(2024, 7, 7));
-            //potential error of repeating ids if created to fast
-            id = (long)sec.TotalSeconds;
+            id = Guid.NewGuid().ToString();
         }
-        public abstract XmlElement getXml();
-        
+        public abstract XElement GetXml();
+        public string Id { get { return id; } }
+        public string TagName { get { return tagName; } }
     }
 }
