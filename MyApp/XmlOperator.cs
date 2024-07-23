@@ -13,7 +13,6 @@ namespace MyApp
         ItemList items;
         XDocument doc;
         string name;
-        XElement root;
         public XmlOperator(string name, ItemList items)
         {
             this.name = "xml/" + name;
@@ -35,7 +34,6 @@ namespace MyApp
             }
             doc = XDocument.Load(this.name);
         }
-
         public void UpdateData()
         {
             if (doc.Root.HasElements)
@@ -48,6 +46,11 @@ namespace MyApp
             }
             doc.Save(name);
                 
+        }
+
+        public XElement Load(string nme)
+        {
+            return doc.Root.Element(nme);
         }
     }
 }

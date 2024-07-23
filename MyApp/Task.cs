@@ -21,6 +21,13 @@ namespace MyApp
             completed = false;
         }
 
+        public Task(XElement el, string tagName, string id) : base(tagName, id)
+        {
+            this.content = el.Attribute("content").Value;
+            this.dueDate = DateTime.Parse(el.Attribute("dueDate").Value);
+            this.expTime = TimeSpan.Parse(el.Attribute("expTime").Value);
+            this.completed = el.Attribute("completed").Value == "true";
+        }
         public bool IsOverdue()
         {
             return DateTime.Now < dueDate;

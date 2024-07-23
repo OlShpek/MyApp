@@ -17,6 +17,12 @@ namespace MyApp
             this.tagName = tagName;
             SetId();
         }
+
+        protected IItem(string tagName, string id)
+        {
+            this.tagName = tagName;
+            this.id = id;
+        }
         protected void SetId()
         {
             id = Guid.NewGuid().ToString();

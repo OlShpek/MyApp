@@ -9,9 +9,9 @@ namespace MyApp
 {
     internal class ItemList : IItem
     {
-        List<IItem> tasks;
-        string name;
-        List<bool> deleted;
+        protected List<IItem> tasks;
+        protected string name;
+        protected List<bool> deleted;
         public ItemList(List<IItem> tasks, string name, string tagName) : base(tagName)
         {
             this.tasks = tasks;
@@ -21,6 +21,10 @@ namespace MyApp
             {
                 deleted[i] = false;
             }
+        }
+
+        protected ItemList(string tagName, string id) : base(tagName, id)
+        {
         }
         public void AddItem(IItem t)
         {
