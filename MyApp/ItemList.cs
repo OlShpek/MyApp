@@ -82,6 +82,10 @@ namespace MyApp
             return list;
         }
 
+        public bool IsDeleted(int i)
+        {
+            return deleted[i];
+        }
         public List<IItem> Tasks { get { return tasks; } }
         public string Name { get { return name; } set { name = value; } }
     }

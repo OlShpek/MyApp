@@ -38,17 +38,22 @@ namespace MyApp
             l.AddItem(new Task("Skething Curves OppOx1", new DateTime(2024, 7, 8), new TimeSpan(2, 0, 0), "task"));
             l.AddItem(new Task("Skething Curves OppOx2", new DateTime(2024, 7, 8), new TimeSpan(2, 0, 0), "task"));
             xml.UpdateData();*/
-
+            Console.WriteLine("To add a task press a \n to change a task press ch \n to delete a task press d \n to mark task as completed press c \n to show all tasks type all \n to exit press e");
             XmlOperator xml = new XmlOperator("tasks.xml", new TaskList(new List<IItem>(), "my list", "list"));
             XElement el = xml.Load("list");
             TaskList tl = new TaskList(el, el.Attribute("id").Value, el.Name.LocalName);
-            Console.WriteLine("Current Tasks Are: ");
-            for (int i = 0; i < tl.Tasks.Count; i++)
-            {
-                Console.WriteLine(tl.GetElementAt(i).Content + " " + tl.GetElementAt(i).DueDate.ToString() + " " + tl.GetElementAt(i).ExpTime.ToString());
-            }
             while(true)
             {
+                Console.WriteLine("Current Tasks Are: ");
+                for (int i = 0; i < tl.Tasks.Count; i++)
+                {
+                    if (tl.GetElementAt(i).Completed || tl.IsDeleted(i))
+                    {
+                        continue;
+                    }
+                    Console.WriteLine("Task id: " + i.ToString());
+                    Console.WriteLine(tl.GetElementAt(i).Content + " " + tl.GetElementAt(i).DueDate.ToString() + " " + tl.GetElementAt(i).ExpTime.ToString());
+                }
                 string c = Console.ReadLine();
                 if (c == "e")
                 {
@@ -65,9 +70,49 @@ namespace MyApp
                     TimeSpan ts = EnterTimeSpan();
                     Task nt = new Task(cont, dt, ts, "task");
                     tl.AddItem(nt);
-                    XmlOperator xml1 = new XmlOperator("tasks.xml", tl);
-                    xml1.UpdateData();
                 }
+                if (c == "d")
+                {
+                    Console.WriteLine("Enter task id");
+                    int id = int.Parse(Console.ReadLine());
+                    tl.RemoveItem(tl.GetElementAt(id).Id);
+                }
+                if (c == "ch")
+                {
+                    Console.WriteLine("Enter task id");
+                    int id = int.Parse(Console.ReadLine());
+                    Console.WriteLine("You can update a task");
+                    Console.Write("Enter the content: ");
+                    string cont = Console.ReadLine();
+                    Console.Write("Enter the date: ");
+                    DateTime dt = EnterDate();
+                    Console.Write("Enter the time span: ");
+                    TimeSpan ts = EnterTimeSpan();
+                    tl.GetElementAt(id).Content = cont;
+                    tl.GetElementAt(id).DueDate = dt;
+                    tl.GetElementAt(id).ExpTime = ts;
+                }
+                if (c == "c")
+                {
+                    Console.WriteLine("Enter task id");
+                    int id = int.Parse(Console.ReadLine());
+                    tl.GetElementAt(id).ChangeComp();
+                }
+                if (c == "all")
+                {
+                    Console.WriteLine("All Tasks Are: ");
+                    for (int i = 0; i < tl.Tasks.Count; i++)
+                    {
+                        if (tl.IsDeleted(i))
+                        {
+                            continue;
+                        }
+                        Console.WriteLine("Task id: " + i.ToString());
+                        Console.WriteLine(tl.GetElementAt(i).Content + " " + tl.GetElementAt(i).DueDate.ToString() + " " + tl.GetElementAt(i).ExpTime.ToString());
+                    }
+                }
+                XmlOperator xml1 = new XmlOperator("tasks.xml", tl);
+                xml1.UpdateData();
             }
         }
     }

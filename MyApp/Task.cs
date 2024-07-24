@@ -26,7 +26,7 @@ namespace MyApp
             this.content = el.Attribute("content").Value;
             this.dueDate = DateTime.Parse(el.Attribute("dueDate").Value);
             this.expTime = TimeSpan.Parse(el.Attribute("expTime").Value);
-            this.completed = el.Attribute("completed").Value == "true";
+            this.completed = el.Attribute("completed").Value == "True";
         }
         public bool IsOverdue()
         {
