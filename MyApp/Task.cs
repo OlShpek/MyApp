@@ -47,9 +47,13 @@ namespace MyApp
         }
         public bool IsOverdue()
         {
-            return DateTime.Now < dueDate;
+            return DateTime.Now > dueDate;
         }
 
+        public void SpecifyTime(int h, int m, int s)
+        {
+            dueDate = new DateTime(dueDate.Year, dueDate.Month, dueDate.Day, h, m, s);
+        }
         public override XElement GetXml()
         {
             XElement el = new XElement(tagName);

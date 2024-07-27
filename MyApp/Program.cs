@@ -11,9 +11,23 @@ namespace MyApp
             int d = int.Parse(Console.ReadLine());
             int m = int.Parse(Console.ReadLine());
             int y = int.Parse(Console.ReadLine());
-            return new DateTime(y, m, d);
+            return new DateTime(y, m, d, 23, 59, 59);
         }
 
+        public static void TaskDisplay(Task t)
+        {
+            if (t.Completed)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+            }
+            else if (t.IsOverdue())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+            }
+            Console.WriteLine(t.Content + " " + t.DueDate.ToString() + " " + t.ExpTime.ToString() + " " + string.Join(", ", t.Tags));
+            Console.ResetColor();
+
+        }
         public static TimeSpan EnterTimeSpan()
         {
             int h = int.Parse(Console.ReadLine());
@@ -22,22 +36,6 @@ namespace MyApp
         }
         public static void Main(string[] args)
         {
-            /*Task t = new Task("Skething Curves OppOx", new DateTime(2024, 7, 8), new TimeSpan(2, 0, 0), "task");
-            Task t1 = new Task("Skething Curves OppOxA", new DateTime(2024, 8, 9), new TimeSpan(2, 0, 0), "task");
-            Task t2 = new Task("Skething Curves OppOxB", new DateTime(2024, 9, 10), new TimeSpan(2, 0, 0), "task");
-            ItemList l = new ItemList(new List<IItem>(), "my list", "list");
-            l.AddItem(t);
-            l.AddItem(t1);
-            l.AddItem(t2);
-            XmlOperator xml = new XmlOperator("tasks.xml", l);
-            xml.UpdateData();
-            t.Content = "Well-defined";
-            l.ChangeItem(t);
-            l.RemoveItem(t2.Id);
-            xml.UpdateData();
-            l.AddItem(new Task("Skething Curves OppOx1", new DateTime(2024, 7, 8), new TimeSpan(2, 0, 0), "task"));
-            l.AddItem(new Task("Skething Curves OppOx2", new DateTime(2024, 7, 8), new TimeSpan(2, 0, 0), "task"));
-            xml.UpdateData();*/
             Console.WriteLine("To add a task press a \n to change a task press ch \n to delete a task press d \n to mark task as completed press c \n to show all tasks type all \n to exit press e");
             XmlOperator xml = new XmlOperator("tasks.xml", new TaskList(new List<IItem>(), "my list", "list"));
             XElement el = xml.Load("list");
@@ -52,7 +50,7 @@ namespace MyApp
                         continue;
                     }
                     Console.WriteLine("Task id: " + i.ToString());
-                    Console.WriteLine(tl.GetElementAt(i).Content + " " + tl.GetElementAt(i).DueDate.ToString() + " " + tl.GetElementAt(i).ExpTime.ToString() + " " + string.Join(", ", tl.GetElementAt(i).Tags));
+                    TaskDisplay(tl.GetElementAt(i));
                 }
                 string c = Console.ReadLine();
                 if (c == "e")
@@ -107,18 +105,33 @@ namespace MyApp
                 }
                 if (c == "ch")
                 {
-                    Console.WriteLine("Enter task id");
-                    int id = int.Parse(Console.ReadLine());
-                    Console.WriteLine("You can update a task");
-                    Console.Write("Enter the content: ");
-                    string cont = Console.ReadLine();
-                    Console.Write("Enter the date: ");
-                    DateTime dt = EnterDate();
-                    Console.Write("Enter the time span: ");
-                    TimeSpan ts = EnterTimeSpan();
-                    tl.GetElementAt(id).Content = cont;
-                    tl.GetElementAt(id).DueDate = dt;
-                    tl.GetElementAt(id).ExpTime = ts;
+                    string c1 = Console.ReadLine();
+                    if (c1 == "gen")
+                    {
+                        Console.WriteLine("Enter task id");
+                        int id = int.Parse(Console.ReadLine());
+                        Console.WriteLine("You can update a task");
+                        Console.Write("Enter the content: ");
+                        string cont = Console.ReadLine();
+                        Console.Write("Enter the date: ");
+                        DateTime dt = EnterDate();
+                        Console.Write("Enter the time span: ");
+                        TimeSpan ts = EnterTimeSpan();
+                        tl.GetElementAt(id).Content = cont;
+                        tl.GetElementAt(id).DueDate = dt;
+                        tl.GetElementAt(id).ExpTime = ts;
+                    }
+                    else if (c1 == "spec time")
+                    {
+                        Console.WriteLine("You can now specify the due time of the task");
+                        Console.WriteLine("Enter task id");
+                        int id = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Enter hours, minuts and seconds next");
+                        int h = int.Parse(Console.ReadLine());
+                        int m = int.Parse(Console.ReadLine());
+                        int s = int.Parse(Console.ReadLine());
+                        tl.GetElementAt(id).SpecifyTime(h, m, s);
+                    }
                 }
                 if (c == "c")
                 {
@@ -128,6 +141,7 @@ namespace MyApp
                 }
                 if (c == "all")
                 {
+                    Console.WriteLine("\n\n\n\n\n");
                     Console.WriteLine("All Tasks Are: ");
                     for (int i = 0; i < tl.Tasks.Count; i++)
                     {
@@ -136,8 +150,9 @@ namespace MyApp
                             continue;
                         }
                         Console.WriteLine("Task id: " + i.ToString());
-                        Console.WriteLine(tl.GetElementAt(i).Content + " " + tl.GetElementAt(i).DueDate.ToString() + " " + tl.GetElementAt(i).ExpTime.ToString());
+                        TaskDisplay(tl.GetElementAt(i));
                     }
+                    Console.WriteLine("\n\n\n\n\n");
                 }
                 XmlOperator xml1 = new XmlOperator("tasks.xml", tl);
                 xml1.UpdateData();
