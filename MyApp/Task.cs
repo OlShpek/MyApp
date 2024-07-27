@@ -13,12 +13,14 @@ namespace MyApp
         DateTime dueDate;
         TimeSpan expTime;
         bool completed;
+        List<string> tags;
         public Task(string content, DateTime dueDate, TimeSpan expTime, string tagName) : base(tagName)
         {
             this.content = content;
             this.dueDate = dueDate;
             this.expTime = expTime;
             completed = false;
+            tags = new List<string>();
         }
 
         public Task(XElement el, string tagName, string id) : base(tagName, id)
@@ -27,6 +29,21 @@ namespace MyApp
             this.dueDate = DateTime.Parse(el.Attribute("dueDate").Value);
             this.expTime = TimeSpan.Parse(el.Attribute("expTime").Value);
             this.completed = el.Attribute("completed").Value == "True";
+            if (el.Attribute("tags") == null)
+            {
+                this.tags = new List<string>();
+            }
+            else
+            {
+                this.tags = el.Attribute("tags").Value.Split(';').ToList<string>();
+                if (tags.Count == 1)
+                {
+                    if (tags[0] == "")
+                    {
+                        tags.RemoveAt(0);
+                    }
+                }
+            }
         }
         public bool IsOverdue()
         {
@@ -41,7 +58,23 @@ namespace MyApp
             el.SetAttributeValue("dueDate", dueDate.ToString());
             el.SetAttributeValue("expTime", expTime.ToString());
             el.SetAttributeValue("completed", completed.ToString());
+            el.SetAttributeValue("tags", TagsToString());
             return el;
+        }
+
+        public void AddTag(string t)
+        {
+            tags.Add(t);
+        }
+
+        public void RemoveTag(string t)
+        {
+            tags.Remove(t);
+        }
+
+        private string TagsToString()
+        {
+            return string.Join(';', tags.ToArray());
         }
 
         public void ChangeComp()
@@ -51,6 +84,7 @@ namespace MyApp
         public string Content { get { return content; }  set { content = value; } }
         public DateTime DueDate { get { return dueDate; } set { dueDate = value; } }
         public TimeSpan ExpTime { get { return expTime; } set { expTime = value; } }
+        public List<string> Tags { get { return tags; } }
         public bool Completed { get { return completed; } }
     }
 }

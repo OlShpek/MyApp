@@ -52,7 +52,7 @@ namespace MyApp
                         continue;
                     }
                     Console.WriteLine("Task id: " + i.ToString());
-                    Console.WriteLine(tl.GetElementAt(i).Content + " " + tl.GetElementAt(i).DueDate.ToString() + " " + tl.GetElementAt(i).ExpTime.ToString());
+                    Console.WriteLine(tl.GetElementAt(i).Content + " " + tl.GetElementAt(i).DueDate.ToString() + " " + tl.GetElementAt(i).ExpTime.ToString() + " " + string.Join(", ", tl.GetElementAt(i).Tags));
                 }
                 string c = Console.ReadLine();
                 if (c == "e")
@@ -61,21 +61,49 @@ namespace MyApp
                 }
                 if (c == "a")
                 {
-                    Console.WriteLine("You can create a task");
-                    Console.Write("Enter the content: ");
-                    string cont = Console.ReadLine();
-                    Console.Write("Enter the date: ");
-                    DateTime dt = EnterDate();
-                    Console.Write("Enter the time span: ");
-                    TimeSpan ts = EnterTimeSpan();
-                    Task nt = new Task(cont, dt, ts, "task");
-                    tl.AddItem(nt);
+                    string c1 = Console.ReadLine();
+                    if (c1 == "task")
+                    {
+                        Console.WriteLine("You can create a task");
+                        Console.Write("Enter the content: ");
+                        string cont = Console.ReadLine();
+                        Console.Write("Enter the date: ");
+                        DateTime dt = EnterDate();
+                        Console.Write("Enter the time span: ");
+                        TimeSpan ts = EnterTimeSpan();
+                        Task nt = new Task(cont, dt, ts, "task");
+                        tl.AddItem(nt);
+                    }
+                    else if (c1 == "tag")
+                    {
+                        Console.WriteLine("You can add a tag to the already existing task; Please Enter the task ID");
+                        int id = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Please Enter the tag");
+                        string t = Console.ReadLine();
+                        Task nt = tl.GetElementAt(id);
+                        nt.AddTag(t);
+                        tl.ChangeItem(nt);
+                    }
                 }
                 if (c == "d")
                 {
-                    Console.WriteLine("Enter task id");
-                    int id = int.Parse(Console.ReadLine());
-                    tl.RemoveItem(tl.GetElementAt(id).Id);
+                    string c1 = Console.ReadLine();
+                    if (c1 == "task")
+                    {
+                        Console.WriteLine("Enter task id");
+                        int id = int.Parse(Console.ReadLine());
+                        tl.RemoveItem(tl.GetElementAt(id).Id);
+                    }
+                    else if (c1 == "tag")
+                    {
+                        Console.WriteLine("You can delete a tag to the already existing task; Please enter the task ID");
+                        int id = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Please Enter the tag");
+                        string t = Console.ReadLine();
+                        Task nt = tl.GetElementAt(id);
+                        nt.RemoveTag(t);
+                        tl.ChangeItem(nt);
+                    }
                 }
                 if (c == "ch")
                 {
