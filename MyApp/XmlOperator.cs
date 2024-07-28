@@ -29,7 +29,7 @@ namespace MyApp
                 string quote = "\"";
                 List<string> lines = new List<string>() { "<?xml version=" + quote + "1.0" + quote + " encoding=" + quote + "utf-8" + quote + "?>" + "\n" + "<rootElement></rootElement>" };
                 File.WriteAllLines(this.name, lines);
-               // sw.WriteLine("<?xml version=" + quote + "1.0" + quote + " encoding=" + quote + "utf-8" + quote + "?>" + "\n" + "<rootElement></rootElement>");
+                // sw.WriteLine("<?xml version=" + quote + "1.0" + quote + " encoding=" + quote + "utf-8" + quote + "?>" + "\n" + "<rootElement></rootElement>");
 
             }
             doc = XDocument.Load(this.name);
@@ -45,12 +45,21 @@ namespace MyApp
                 doc.Root.Add(items.GetXml());
             }
             doc.Save(name);
-                
+
         }
 
         public XElement Load(string nme)
         {
             return doc.Root.Element(nme);
+        }
+
+        public XElement LoadFromList()
+        {
+            if (doc.Root.Element(items.TagName) == null)
+            {
+                doc.Root.Add(items.GetXml());
+            }
+            return doc.Root.Element(items.TagName);
         }
     }
 }

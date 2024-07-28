@@ -16,11 +16,7 @@ namespace MyApp
         {
             this.tasks = tasks;
             this.name = name;
-            deleted = new List<bool>(tasks.Count);
-            for (int i = 0; i < tasks.Count; i++)
-            {
-                deleted[i] = false;
-            }
+            FillBoolList(tasks.Count);
         }
 
         protected ItemList(string tagName, string id) : base(tagName, id)
@@ -82,11 +78,21 @@ namespace MyApp
             return list;
         }
 
+        protected void FillBoolList(int n)
+        {
+            deleted = new List<bool>();
+            for (int i = 0; i < n; i++)
+            {
+                deleted.Add(false);
+            }
+        }
+
         public bool IsDeleted(int i)
         {
             return deleted[i];
         }
         public List<IItem> Tasks { get { return tasks; } }
         public string Name { get { return name; } set { name = value; } }
+        public int Count { get { return tasks.Count; } }
     }
 }

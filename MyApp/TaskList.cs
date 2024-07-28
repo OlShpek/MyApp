@@ -20,11 +20,7 @@ namespace MyApp
             {
                 tasks.Add(new Task(els[i], els[i].Name.LocalName, els[i].Attribute("id").Value));
             }
-            deleted = new List<bool>();
-            for (int i = 0; i < tasks.Count; i++)
-            {
-                deleted.Add(false);
-            }
+            FillBoolList(tasks.Count);
             name = el.Name.LocalName;
         }
 

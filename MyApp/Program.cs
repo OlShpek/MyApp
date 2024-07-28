@@ -6,6 +6,16 @@ namespace MyApp
 {
     class Program
     { 
+        public static void DisplayTags(List<string> tags, ColouredItemList globalTags)
+        {
+            for (int i = 0; i < tags.Count; i++)
+            {
+                ColouredItem tag = (ColouredItem)globalTags.GetItemById(tags[i]);
+                ConsoleColor cl = (ConsoleColor)Enum.Parse(typeof(ConsoleColor), tag.Colour);
+                Console.ForegroundColor = cl;
+                Console.Write(tag.Content + " ");
+            }    
+        }
         public static DateTime EnterDate()
         {
             int d = int.Parse(Console.ReadLine());
@@ -14,7 +24,7 @@ namespace MyApp
             return new DateTime(y, m, d, 23, 59, 59);
         }
 
-        public static void TaskDisplay(Task t)
+        public static void TaskDisplay(Task t, ColouredItemList tags)
         {
             if (t.Completed)
             {
@@ -24,9 +34,10 @@ namespace MyApp
             {
                 Console.ForegroundColor = ConsoleColor.Red;
             }
-            Console.WriteLine(t.Content + " " + t.DueDate.ToString() + " " + t.ExpTime.ToString() + " " + string.Join(", ", t.Tags));
+            Console.Write(t.Content + " " + t.DueDate.ToString() + " " + t.ExpTime.ToString() + " ");
+            DisplayTags(t.Tags, tags);
+            Console.WriteLine();
             Console.ResetColor();
-
         }
         public static TimeSpan EnterTimeSpan()
         {
@@ -36,10 +47,14 @@ namespace MyApp
         }
         public static void Main(string[] args)
         {
+            Console.ResetColor();
             Console.WriteLine("To add a task press a \n to change a task press ch \n to delete a task press d \n to mark task as completed press c \n to show all tasks type all \n to exit press e");
             XmlOperator xml = new XmlOperator("tasks.xml", new TaskList(new List<IItem>(), "my list", "list"));
             XElement el = xml.Load("list");
             TaskList tl = new TaskList(el, el.Attribute("id").Value, el.Name.LocalName);
+            XmlOperator xmlTag = new XmlOperator("tags.xml", new ColouredItemList(new List<IItem>(), "tags", "tagList"));
+            XElement tagEl = xmlTag.LoadFromList();
+            ColouredItemList tags = new ColouredItemList(tagEl, "tagList", tagEl.Attribute("id").Value);
             while(true)
             {
                 Console.WriteLine("Current Tasks Are: ");
@@ -50,7 +65,7 @@ namespace MyApp
                         continue;
                     }
                     Console.WriteLine("Task id: " + i.ToString());
-                    TaskDisplay(tl.GetElementAt(i));
+                    TaskDisplay(tl.GetElementAt(i), tags);
                 }
                 string c = Console.ReadLine();
                 if (c == "e")
@@ -78,9 +93,19 @@ namespace MyApp
                         int id = int.Parse(Console.ReadLine());
                         Console.WriteLine("Please Enter the tag");
                         string t = Console.ReadLine();
-                        Task nt = tl.GetElementAt(id);
-                        nt.AddTag(t);
-                        tl.ChangeItem(nt);
+                        if (!tags.Exists(t))
+                        {
+                            Console.WriteLine("Please Specify the colour of the tag");
+                            string col = Console.ReadLine();
+                            ColouredItem ci = new ColouredItem(t, col, "tag");
+                            tags.AddItem(ci);
+                            tl.GetElementAt(id).AddTag(ci.Id);
+                        }
+                        else
+                        {
+                            tl.GetElementAt(id).AddTag(tags.GetElementByName(t).Id);
+                        }
+                        
                     }
                 }
                 if (c == "d")
@@ -96,11 +121,9 @@ namespace MyApp
                     {
                         Console.WriteLine("You can delete a tag to the already existing task; Please enter the task ID");
                         int id = int.Parse(Console.ReadLine());
-                        Console.WriteLine("Please Enter the tag");
+                        Console.WriteLine("Please Enter the tag name");
                         string t = Console.ReadLine();
-                        Task nt = tl.GetElementAt(id);
-                        nt.RemoveTag(t);
-                        tl.ChangeItem(nt);
+                        tl.GetElementAt(id).RemoveTag(tags.GetElementByName(t).Id);
                     }
                 }
                 if (c == "ch")
@@ -132,6 +155,14 @@ namespace MyApp
                         int s = int.Parse(Console.ReadLine());
                         tl.GetElementAt(id).SpecifyTime(h, m, s);
                     }
+                    else if (c1 == "tag colour")
+                    {
+                        Console.WriteLine("You can now specify tag colour; Enter tag Name");
+                        string cont = Console.ReadLine();
+                        Console.WriteLine("Enter tag Colour");
+                        string col = Console.ReadLine();
+                        tags.SpecifyColour(cont, col, "tag");
+                    }
                 }
                 if (c == "c")
                 {
@@ -150,11 +181,13 @@ namespace MyApp
                             continue;
                         }
                         Console.WriteLine("Task id: " + i.ToString());
-                        TaskDisplay(tl.GetElementAt(i));
+                        TaskDisplay(tl.GetElementAt(i), tags);
                     }
                     Console.WriteLine("\n\n\n\n\n");
                 }
                 XmlOperator xml1 = new XmlOperator("tasks.xml", tl);
+                XmlOperator xmlT = new XmlOperator("tags.xml", tags);
+                xmlT.UpdateData();
                 xml1.UpdateData();
             }
         }
