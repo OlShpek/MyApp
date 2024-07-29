@@ -24,7 +24,7 @@ namespace MyApp
             return new DateTime(y, m, d, 23, 59, 59);
         }
 
-        public static void TaskDisplay(Task t, ColouredItemList tags)
+        public static void TaskDisplay(Task t, ColouredItemList tags, ColouredItemList urglevs)
         {
             if (t.Completed)
             {
@@ -35,6 +35,12 @@ namespace MyApp
                 Console.ForegroundColor = ConsoleColor.Red;
             }
             Console.Write(t.Content + " " + t.DueDate.ToString() + " " + t.ExpTime.ToString() + " ");
+            if (t.UrgencyLevel != 0)
+            {
+                List<string> urglevel = new List<string>();
+                urglevel.Add(t.UrgencyLevel.ToString());
+                DisplayTags(urglevel, urglevs);
+            }
             DisplayTags(t.Tags, tags);
             Console.WriteLine();
             Console.ResetColor();
@@ -55,6 +61,9 @@ namespace MyApp
             XmlOperator xmlTag = new XmlOperator("tags.xml", new ColouredItemList(new List<IItem>(), "tags", "tagList"));
             XElement tagEl = xmlTag.LoadFromList();
             ColouredItemList tags = new ColouredItemList(tagEl, "tagList", tagEl.Attribute("id").Value);
+            XmlOperator xmlUrg = new XmlOperator("urglev.xml", new ColouredItemList(new List<IItem>(), "levs", "LevelList"));
+            XElement urgLevsEl = xmlUrg.LoadFromList();
+            ColouredItemList urgLevels = new ColouredItemList(urgLevsEl, urgLevsEl.Name.LocalName, urgLevsEl.Attribute("id").Value);
             while(true)
             {
                 Console.WriteLine("Current Tasks Are: ");
@@ -65,7 +74,7 @@ namespace MyApp
                         continue;
                     }
                     Console.WriteLine("Task id: " + i.ToString());
-                    TaskDisplay(tl.GetElementAt(i), tags);
+                    TaskDisplay(tl.GetElementAt(i), tags, urgLevels);
                 }
                 string c = Console.ReadLine();
                 if (c == "e")
@@ -107,6 +116,26 @@ namespace MyApp
                         }
                         
                     }
+                    else if (c1 == "urgency level")
+                    {
+                        Console.WriteLine("You can add a tag to the already existing task; Please Enter the task ID");
+                        int id = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Please Enter the urgency level name");
+                        string t = Console.ReadLine();
+                        if (!urgLevels.Exists(t))
+                        {
+                            Console.WriteLine("Please Specify the colour of the urgency level and its importance value");
+                            string col = Console.ReadLine();
+                            string impVal = Console.ReadLine();
+                            ColouredItem ci = new ColouredItem(t, col, impVal, "level");
+                            tl.GetElementAt(id).UrgencyLevel = int.Parse(impVal);
+                            urgLevels.AddItem(ci);
+                        }
+                        else
+                        {
+                            tl.GetElementAt(id).UrgencyLevel = int.Parse(urgLevels.GetElementByName(t).Id);
+                        }
+                    }
                 }
                 if (c == "d")
                 {
@@ -119,11 +148,17 @@ namespace MyApp
                     }
                     else if (c1 == "tag")
                     {
-                        Console.WriteLine("You can delete a tag to the already existing task; Please enter the task ID");
+                        Console.WriteLine("You can delete a tag of the already existing task; Please enter the task ID");
                         int id = int.Parse(Console.ReadLine());
                         Console.WriteLine("Please Enter the tag name");
                         string t = Console.ReadLine();
                         tl.GetElementAt(id).RemoveTag(tags.GetElementByName(t).Id);
+                    }
+                    else if (c1 == "urgency level")
+                    {
+                        Console.WriteLine("You can delete an urgency level of the already existing task; Please enter the task ID");
+                        int id = int.Parse(Console.ReadLine());
+                        tl.GetElementAt(id).UrgencyLevel = 0;
                     }
                 }
                 if (c == "ch")
@@ -181,12 +216,14 @@ namespace MyApp
                             continue;
                         }
                         Console.WriteLine("Task id: " + i.ToString());
-                        TaskDisplay(tl.GetElementAt(i), tags);
+                        TaskDisplay(tl.GetElementAt(i), tags, urgLevels);
                     }
                     Console.WriteLine("\n\n\n\n\n");
                 }
                 XmlOperator xml1 = new XmlOperator("tasks.xml", tl);
                 XmlOperator xmlT = new XmlOperator("tags.xml", tags);
+                XmlOperator xmlU = new XmlOperator("urglev.xml", urgLevels);
+                xmlU.UpdateData();
                 xmlT.UpdateData();
                 xml1.UpdateData();
             }

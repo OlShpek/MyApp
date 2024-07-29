@@ -23,18 +23,6 @@ namespace MyApp
             FillBoolList(tasks.Count);
             name = el.Name.LocalName;
         }
-
-        public string GetColour(string name)
-        {
-            for (int i = 0; i < tasks.Count; i++)
-            {
-                if (GetElementAt(i).Content == name)
-                {
-                    return GetElementAt(i).Colour;
-                }
-            }
-            return "None";
-        }
         
         public bool Exists(string name)
         {

@@ -14,6 +14,7 @@ namespace MyApp
         TimeSpan expTime;
         bool completed;
         List<string> tags;
+        int urg_level;
         public Task(string content, DateTime dueDate, TimeSpan expTime, string tagName) : base(tagName)
         {
             this.content = content;
@@ -21,6 +22,7 @@ namespace MyApp
             this.expTime = expTime;
             completed = false;
             tags = new List<string>();
+            urg_level = 0;
         }
 
         public Task(XElement el, string tagName, string id) : base(tagName, id)
@@ -44,6 +46,14 @@ namespace MyApp
                     }
                 }
             }
+            if (el.Attribute("urglevel") == null)
+            {
+                urg_level = 0;
+            }
+            else
+            {
+                urg_level = int.Parse(el.Attribute("urglevel").Value);
+            }
         }
         public bool IsOverdue()
         {
@@ -63,6 +73,7 @@ namespace MyApp
             el.SetAttributeValue("expTime", expTime.ToString());
             el.SetAttributeValue("completed", completed.ToString());
             el.SetAttributeValue("tags", TagsToString());
+            el.SetAttributeValue("urglevel", urg_level.ToString());
             return el;
         }
 
@@ -88,6 +99,7 @@ namespace MyApp
         public string Content { get { return content; }  set { content = value; } }
         public DateTime DueDate { get { return dueDate; } set { dueDate = value; } }
         public TimeSpan ExpTime { get { return expTime; } set { expTime = value; } }
+        public int UrgencyLevel { get { return urg_level; } set { urg_level = value; } }
         public List<string> Tags { get { return tags; } }
         public bool Completed { get { return completed; } }
     }
