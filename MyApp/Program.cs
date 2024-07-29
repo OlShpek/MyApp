@@ -35,7 +35,7 @@ namespace MyApp
                 Console.ForegroundColor = ConsoleColor.Red;
             }
             Console.Write(t.Content + " " + t.DueDate.ToString() + " " + t.ExpTime.ToString() + " ");
-            if (t.UrgencyLevel != 0)
+            if (t.UrgencyLevel != "0")
             {
                 List<string> urglevel = new List<string>();
                 urglevel.Add(t.UrgencyLevel.ToString());
@@ -126,14 +126,14 @@ namespace MyApp
                         {
                             Console.WriteLine("Please Specify the colour of the urgency level and its importance value");
                             string col = Console.ReadLine();
-                            string impVal = Console.ReadLine();
-                            ColouredItem ci = new ColouredItem(t, col, impVal, "level");
-                            tl.GetElementAt(id).UrgencyLevel = int.Parse(impVal);
-                            urgLevels.AddItem(ci);
+                            int impVal = int.Parse(Console.ReadLine());
+                            UrgencyLevel ul = new UrgencyLevel(t, col, impVal, "level");
+                            tl.GetElementAt(id).UrgencyLevel = ul.Id;
+                            urgLevels.AddItem(ul);
                         }
                         else
                         {
-                            tl.GetElementAt(id).UrgencyLevel = int.Parse(urgLevels.GetElementByName(t).Id);
+                            tl.GetElementAt(id).UrgencyLevel = urgLevels.GetElementByName(t).Id;
                         }
                     }
                 }
@@ -158,7 +158,7 @@ namespace MyApp
                     {
                         Console.WriteLine("You can delete an urgency level of the already existing task; Please enter the task ID");
                         int id = int.Parse(Console.ReadLine());
-                        tl.GetElementAt(id).UrgencyLevel = 0;
+                        tl.GetElementAt(id).UrgencyLevel = "0";
                     }
                 }
                 if (c == "ch")
