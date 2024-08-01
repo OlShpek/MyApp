@@ -37,7 +37,7 @@ namespace MyApp
             return el;
         }
 
-        public string Content { get { return content; } }
+        public string Content { get { return content; } set { content = value; } }
         public string Colour { get { return colour; } set { colour = value; } }
     }
 }

@@ -160,6 +160,20 @@ namespace MyApp
                         int id = int.Parse(Console.ReadLine());
                         tl.GetElementAt(id).UrgencyLevel = "0";
                     }
+                    else if (c1 == "glob tag")
+                    {
+                        Console.WriteLine("You can delete tag globaly; Please enter tag name");
+                        string cont = Console.ReadLine();
+                        tags.RemoveItem(tags.GetElementByName(cont).Id);
+                        tl.RemoveTags(tags.GetElementByName(cont).Id);
+                    }
+                    else if (c1 == "glob urg level")
+                    {
+                        Console.WriteLine("You can delete urgency level globaly; Please enter urgency level name");
+                        string cont = Console.ReadLine();
+                        urgLevels.RemoveItem(urgLevels.GetElementByName(cont).Id);
+                        tl.RemoveULevel(urgLevels.GetElementByName(cont).Id);
+                    }
                 }
                 if (c == "ch")
                 {
@@ -198,6 +212,28 @@ namespace MyApp
                         string col = Console.ReadLine();
                         tags.SpecifyColour(cont, col, "tag");
                     }
+                    else if (c1 == "glob tag name")
+                    {
+                        Console.WriteLine("You can now change the tag name globally. Please Enter the old and the new name");
+                        string old = Console.ReadLine();
+                        string new_n = Console.ReadLine();
+                        tags.GetElementByName(old).Content = new_n;
+                    }
+                    else if (c1 == "glob urg name")
+                    {
+                        Console.WriteLine("You can now change the urgency level name globally. Please Enter the old and the new name");
+                        string old = Console.ReadLine();
+                        string new_n = Console.ReadLine();
+                        urgLevels.GetElementByName(old).Content = new_n;
+                    }
+                    else if (c1 == "glob urg value")
+                    {
+                        Console.WriteLine("You can now change the value of the urgency level; Enter the urgency level name and then its value");
+                        string cont = Console.ReadLine();
+                        int val = int.Parse(Console.ReadLine());
+                        UrgencyLevel ul = (UrgencyLevel)urgLevels.GetElementByName(cont);
+                        ul.ULevel = val;
+                    }    
                 }
                 if (c == "c")
                 {

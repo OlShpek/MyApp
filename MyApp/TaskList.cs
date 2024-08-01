@@ -28,5 +28,24 @@ namespace MyApp
         {
             return (Task)tasks[i];
         }
+
+        public void RemoveTags(string id)
+        {
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                GetElementAt(i).RemoveTag(id);
+            }
+        }
+
+        public void RemoveULevel(string id)
+        {
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                if (GetElementAt(i).UrgencyLevel == id)
+                {
+                    GetElementAt(i).UrgencyLevel = "0";
+                }
+            }
+        }
     }
 }
