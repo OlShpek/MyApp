@@ -15,6 +15,7 @@ namespace MyApp
         bool completed;
         List<string> tags;
         string urg_level;
+        TaskList subtasks;
         public Task(string content, DateTime dueDate, TimeSpan expTime, string tagName) : base(tagName)
         {
             this.content = content;
@@ -23,9 +24,10 @@ namespace MyApp
             completed = false;
             tags = new List<string>();
             urg_level = "0";
+            subtasks = new TaskList(new List<IItem>(), "mylist", "subtasks");
         }
 
-        public Task(XElement el, string tagName, string id) : base(tagName, id)
+        public Task(XElement el) : base(el)
         {
             this.content = el.Attribute("content").Value;
             this.dueDate = DateTime.Parse(el.Attribute("dueDate").Value);
@@ -54,6 +56,15 @@ namespace MyApp
             {
                 urg_level = el.Attribute("urglevel").Value;
             }
+            if (el.HasElements)
+            {
+                XElement mainel = el.Element("subtasks");
+                subtasks = new TaskList(mainel);
+            }
+            else
+            {
+                subtasks = new TaskList(new List<IItem>(), "mylist", "subtasks");
+            }
         }
         public bool IsOverdue()
         {
@@ -64,6 +75,7 @@ namespace MyApp
         {
             dueDate = new DateTime(dueDate.Year, dueDate.Month, dueDate.Day, h, m, s);
         }
+
         public override XElement GetXml()
         {
             XElement el = new XElement(tagName);
@@ -74,6 +86,7 @@ namespace MyApp
             el.SetAttributeValue("completed", completed.ToString());
             el.SetAttributeValue("tags", TagsToString());
             el.SetAttributeValue("urglevel", urg_level);
+            el.Add(subtasks.GetXml());
             return el;
         }
 
@@ -87,6 +100,24 @@ namespace MyApp
             tags.Remove(t);
         }
 
+        public void AddSubTask(Task t)
+        {
+            subtasks.AddItem(t);
+        }
+
+        public void RemoveSubTask(Task t)
+        {
+            subtasks.RemoveItem(t.Id);
+        }
+
+        public void AutoCreate(string mainCont, int count, int chPart)
+        {
+            for (int i = chPart; i < count + chPart; i++)
+            {
+                Task t = new Task(mainCont + chPart.ToString(), dueDate, expTime, tagName);
+                subtasks.AddItem(t);
+            }
+        }
         private string TagsToString()
         {
             return string.Join(';', tags.ToArray());
@@ -101,6 +132,7 @@ namespace MyApp
         public TimeSpan ExpTime { get { return expTime; } set { expTime = value; } }
         public string UrgencyLevel { get { return urg_level; } set { urg_level = value; } }
         public List<string> Tags { get { return tags; } }
+        public TaskList Subtasks { get { return subtasks; } }
         public bool Completed { get { return completed; } }
     }
 }

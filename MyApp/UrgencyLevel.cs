@@ -15,7 +15,7 @@ namespace MyApp
             this.uLevel = ulevel;
         }
 
-        public UrgencyLevel(XElement el, string tagName, string id) : base(el, tagName, id)
+        public UrgencyLevel(XElement el) : base(el)
         {
             uLevel = int.Parse(el.Attribute("uLevel").Value);
         }

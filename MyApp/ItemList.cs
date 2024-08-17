@@ -19,7 +19,7 @@ namespace MyApp
             FillBoolList(tasks.Count);
         }
 
-        protected ItemList(string tagName, string id) : base(tagName, id)
+        protected ItemList(XElement el) : base(el)
         {
         }
         public void AddItem(IItem t)

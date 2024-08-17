@@ -22,7 +22,7 @@ namespace MyApp
             this.content = content;
             this.colour = colour;
         }
-        public ColouredItem(XElement el, string tagName, string id) : base(tagName, id)
+        public ColouredItem(XElement el) : base(el)
         {
             content = el.Attribute("content").Value;
             colour = el.Attribute("colour").Value;

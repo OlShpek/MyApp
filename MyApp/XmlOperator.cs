@@ -13,10 +13,25 @@ namespace MyApp
         ItemList items;
         XDocument doc;
         string name;
+
+        public XmlOperator(string name)
+        {
+            this.name = "xml/" + name;
+            items = new ItemList(new List<IItem>(), "", "");
+            CreatePath();
+            doc = XDocument.Load(this.name);
+        }
+
         public XmlOperator(string name, ItemList items)
         {
             this.name = "xml/" + name;
             this.items = items;
+            CreatePath();
+            doc = XDocument.Load(this.name);
+        }
+
+        private void CreatePath()
+        {
             if (!Directory.Exists("xml"))
             {
                 Directory.CreateDirectory("xml");
@@ -30,9 +45,7 @@ namespace MyApp
                 List<string> lines = new List<string>() { "<?xml version=" + quote + "1.0" + quote + " encoding=" + quote + "utf-8" + quote + "?>" + "\n" + "<rootElement></rootElement>" };
                 File.WriteAllLines(this.name, lines);
                 // sw.WriteLine("<?xml version=" + quote + "1.0" + quote + " encoding=" + quote + "utf-8" + quote + "?>" + "\n" + "<rootElement></rootElement>");
-
             }
-            doc = XDocument.Load(this.name);
         }
         public void UpdateData()
         {
@@ -50,16 +63,13 @@ namespace MyApp
 
         public XElement Load(string nme)
         {
-            return doc.Root.Element(nme);
-        }
-
-        public XElement LoadFromList()
-        {
-            if (doc.Root.Element(items.TagName) == null)
+            if (doc.Root.Element(nme) == null)
             {
-                doc.Root.Add(items.GetXml());
+                XElement el = new XElement(nme);
+                el.SetAttributeValue("id", items.Id);
+                doc.Root.Add(el);
             }
-            return doc.Root.Element(items.TagName);
+            return doc.Root.Element(nme);
         }
     }
 }

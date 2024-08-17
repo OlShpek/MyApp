@@ -23,6 +23,13 @@ namespace MyApp
             this.tagName = tagName;
             this.id = id;
         }
+
+        protected IItem(XElement el)
+        {
+            this.tagName = el.Name.LocalName;
+            this.id = el.Attribute("id").Value;
+        }
+
         protected void SetId()
         {
             id = Guid.NewGuid().ToString();

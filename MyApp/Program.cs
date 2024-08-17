@@ -5,77 +5,23 @@ using System.Xml.Linq;
 namespace MyApp
 {
     class Program
-    { 
-        public static void DisplayTags(List<string> tags, ColouredItemList globalTags)
-        {
-            for (int i = 0; i < tags.Count; i++)
-            {
-                ColouredItem tag = (ColouredItem)globalTags.GetItemById(tags[i]);
-                ConsoleColor cl = (ConsoleColor)Enum.Parse(typeof(ConsoleColor), tag.Colour);
-                Console.ForegroundColor = cl;
-                Console.Write(tag.Content + " ");
-            }    
-        }
-        public static DateTime EnterDate()
-        {
-            int d = int.Parse(Console.ReadLine());
-            int m = int.Parse(Console.ReadLine());
-            int y = int.Parse(Console.ReadLine());
-            return new DateTime(y, m, d, 23, 59, 59);
-        }
-
-        public static void TaskDisplay(Task t, ColouredItemList tags, ColouredItemList urglevs)
-        {
-            if (t.Completed)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-            }
-            else if (t.IsOverdue())
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-            }
-            Console.Write(t.Content + " " + t.DueDate.ToString() + " " + t.ExpTime.ToString() + " ");
-            if (t.UrgencyLevel != "0")
-            {
-                List<string> urglevel = new List<string>();
-                urglevel.Add(t.UrgencyLevel.ToString());
-                DisplayTags(urglevel, urglevs);
-            }
-            DisplayTags(t.Tags, tags);
-            Console.WriteLine();
-            Console.ResetColor();
-        }
-        public static TimeSpan EnterTimeSpan()
-        {
-            int h = int.Parse(Console.ReadLine());
-            int m = int.Parse(Console.ReadLine());
-            return new TimeSpan(h, m, 0);
-        }
+    {
         public static void Main(string[] args)
         {
             Console.ResetColor();
             Console.WriteLine("To add a task press a \n to change a task press ch \n to delete a task press d \n to mark task as completed press c \n to show all tasks type all \n to exit press e");
-            XmlOperator xml = new XmlOperator("tasks.xml", new TaskList(new List<IItem>(), "my list", "list"));
-            XElement el = xml.Load("list");
-            TaskList tl = new TaskList(el, el.Attribute("id").Value, el.Name.LocalName);
-            XmlOperator xmlTag = new XmlOperator("tags.xml", new ColouredItemList(new List<IItem>(), "tags", "tagList"));
-            XElement tagEl = xmlTag.LoadFromList();
-            ColouredItemList tags = new ColouredItemList(tagEl, "tagList", tagEl.Attribute("id").Value);
-            XmlOperator xmlUrg = new XmlOperator("urglev.xml", new ColouredItemList(new List<IItem>(), "levs", "LevelList"));
-            XElement urgLevsEl = xmlUrg.LoadFromList();
-            ColouredItemList urgLevels = new ColouredItemList(urgLevsEl, urgLevsEl.Name.LocalName, urgLevsEl.Attribute("id").Value);
+            TaskManagerSystem tms = new TaskManagerSystem();
+            tms.MainProcess();
+            
+            /*XmlOperator xml = new XmlOperator("tasks.xml");
+            TaskList tl = new TaskList(xml.Load("list"));
+            XmlOperator xmlTag = new XmlOperator("tags.xml");
+            ColouredItemList tags = new ColouredItemList(xmlTag.Load("tagList"));
+            XmlOperator xmlUrg = new XmlOperator("urglev.xml");
+            ColouredItemList urgLevels = new ColouredItemList(xmlUrg.Load("LevelList"));
             while(true)
             {
-                Console.WriteLine("Current Tasks Are: ");
-                for (int i = 0; i < tl.Tasks.Count; i++)
-                {
-                    if (tl.GetElementAt(i).Completed || tl.IsDeleted(i))
-                    {
-                        continue;
-                    }
-                    Console.WriteLine("Task id: " + i.ToString());
-                    TaskDisplay(tl.GetElementAt(i), tags, urgLevels);
-                }
+                ConsoleTask.TaskListDisplay(tl, urgLevels, tags, "Current tasks are", false);
                 string c = Console.ReadLine();
                 if (c == "e")
                 {
@@ -86,22 +32,12 @@ namespace MyApp
                     string c1 = Console.ReadLine();
                     if (c1 == "task")
                     {
-                        Console.WriteLine("You can create a task");
-                        Console.Write("Enter the content: ");
-                        string cont = Console.ReadLine();
-                        Console.Write("Enter the date: ");
-                        DateTime dt = EnterDate();
-                        Console.Write("Enter the time span: ");
-                        TimeSpan ts = EnterTimeSpan();
-                        Task nt = new Task(cont, dt, ts, "task");
-                        tl.AddItem(nt);
+                        tl.AddItem(ConsoleTask.CreateTask("You can create a task"));
                     }
                     else if (c1 == "tag")
                     {
-                        Console.WriteLine("You can add a tag to the already existing task; Please Enter the task ID");
-                        int id = int.Parse(Console.ReadLine());
-                        Console.WriteLine("Please Enter the tag");
-                        string t = Console.ReadLine();
+                        int id = ConsoleTask.GetTaskId("You can add a tag to the already existing task");
+                        string t = ConsoleTags.EnterStr("Please Enter the tag", 1)[0];
                         if (!tags.Exists(t))
                         {
                             Console.WriteLine("Please Specify the colour of the tag");
@@ -118,10 +54,8 @@ namespace MyApp
                     }
                     else if (c1 == "urgency level")
                     {
-                        Console.WriteLine("You can add a tag to the already existing task; Please Enter the task ID");
-                        int id = int.Parse(Console.ReadLine());
-                        Console.WriteLine("Please Enter the urgency level name");
-                        string t = Console.ReadLine();
+                        int id = ConsoleTask.GetTaskId("You can add a tag to the already existing task");
+                        string t = ConsoleTags.EnterStr("Please Enter the urgency level name", 1)[0];
                         if (!urgLevels.Exists(t))
                         {
                             Console.WriteLine("Please Specify the colour of the urgency level and its importance value");
@@ -142,35 +76,28 @@ namespace MyApp
                     string c1 = Console.ReadLine();
                     if (c1 == "task")
                     {
-                        Console.WriteLine("Enter task id");
-                        int id = int.Parse(Console.ReadLine());
-                        tl.RemoveItem(tl.GetElementAt(id).Id);
+                        tl.RemoveItem(tl.GetElementAt(ConsoleTask.GetTaskId()).Id);
                     }
                     else if (c1 == "tag")
                     {
-                        Console.WriteLine("You can delete a tag of the already existing task; Please enter the task ID");
-                        int id = int.Parse(Console.ReadLine());
-                        Console.WriteLine("Please Enter the tag name");
-                        string t = Console.ReadLine();
+                        int id = ConsoleTask.GetTaskId("You can delete a tag of the already existing task");
+                        string t = ConsoleTags.EnterStr("Please Enter the tag name", 1)[0];
                         tl.GetElementAt(id).RemoveTag(tags.GetElementByName(t).Id);
                     }
                     else if (c1 == "urgency level")
                     {
-                        Console.WriteLine("You can delete an urgency level of the already existing task; Please enter the task ID");
-                        int id = int.Parse(Console.ReadLine());
-                        tl.GetElementAt(id).UrgencyLevel = "0";
+                        Console.WriteLine("You can delete an urgency level of the already existing task"); 
+                        tl.GetElementAt(ConsoleTask.GetTaskId()).UrgencyLevel = "0";
                     }
                     else if (c1 == "glob tag")
                     {
-                        Console.WriteLine("You can delete tag globaly; Please enter tag name");
-                        string cont = Console.ReadLine();
+                        string cont = ConsoleTags.EnterStr("You can delete tag globaly; Please enter tag name", 1)[0];
                         tags.RemoveItem(tags.GetElementByName(cont).Id);
                         tl.RemoveTags(tags.GetElementByName(cont).Id);
                     }
                     else if (c1 == "glob urg level")
                     {
-                        Console.WriteLine("You can delete urgency level globaly; Please enter urgency level name");
-                        string cont = Console.ReadLine();
+                        string cont = ConsoleTags.EnterStr("You can delete tag globaly; Please enter tag name", 1)[0];
                         urgLevels.RemoveItem(urgLevels.GetElementByName(cont).Id);
                         tl.RemoveULevel(urgLevels.GetElementByName(cont).Id);
                     }
@@ -180,51 +107,33 @@ namespace MyApp
                     string c1 = Console.ReadLine();
                     if (c1 == "gen")
                     {
-                        Console.WriteLine("Enter task id");
-                        int id = int.Parse(Console.ReadLine());
-                        Console.WriteLine("You can update a task");
-                        Console.Write("Enter the content: ");
-                        string cont = Console.ReadLine();
-                        Console.Write("Enter the date: ");
-                        DateTime dt = EnterDate();
-                        Console.Write("Enter the time span: ");
-                        TimeSpan ts = EnterTimeSpan();
-                        tl.GetElementAt(id).Content = cont;
-                        tl.GetElementAt(id).DueDate = dt;
-                        tl.GetElementAt(id).ExpTime = ts;
+                        int id = ConsoleTask.GetTaskId();
+                        Task t = ConsoleTask.CreateTask("You can update a task");
+                        tl.GetElementAt(id).Content = t.Content;
+                        tl.GetElementAt(id).DueDate = t.DueDate;
+                        tl.GetElementAt(id).ExpTime = t.ExpTime;
                     }
                     else if (c1 == "spec time")
                     {
-                        Console.WriteLine("You can now specify the due time of the task");
-                        Console.WriteLine("Enter task id");
-                        int id = int.Parse(Console.ReadLine());
-                        Console.WriteLine("Enter hours, minuts and seconds next");
-                        int h = int.Parse(Console.ReadLine());
-                        int m = int.Parse(Console.ReadLine());
-                        int s = int.Parse(Console.ReadLine());
-                        tl.GetElementAt(id).SpecifyTime(h, m, s);
+                        List<int> comm = ConsoleTask.SpecifyTimeSpan();
+                        tl.GetElementAt(comm[0]).SpecifyTime(comm[1], comm[2], comm[3]);
                     }
                     else if (c1 == "tag colour")
                     {
                         Console.WriteLine("You can now specify tag colour; Enter tag Name");
-                        string cont = Console.ReadLine();
-                        Console.WriteLine("Enter tag Colour");
-                        string col = Console.ReadLine();
-                        tags.SpecifyColour(cont, col, "tag");
+                        List<string> str = ConsoleTags.EnterStr("You can now specify tag colour; Enter tag Name and colour next", 2);
+                        tags.SpecifyColour(str[0], str[1], "tag");
                     }
                     else if (c1 == "glob tag name")
-                    {
-                        Console.WriteLine("You can now change the tag name globally. Please Enter the old and the new name");
-                        string old = Console.ReadLine();
-                        string new_n = Console.ReadLine();
-                        tags.GetElementByName(old).Content = new_n;
+                    { 
+                        List<string> str = ConsoleTags.EnterStr("You can now change the tag name globally. Please Enter the old and the new name", 2);
+                        tags.GetElementByName(str[0]).Content = str[1];
                     }
                     else if (c1 == "glob urg name")
                     {
                         Console.WriteLine("You can now change the urgency level name globally. Please Enter the old and the new name");
-                        string old = Console.ReadLine();
-                        string new_n = Console.ReadLine();
-                        urgLevels.GetElementByName(old).Content = new_n;
+                        List<string> str = ConsoleTags.EnterStr("You can now change the urgency level name globally. Please Enter the old and the new name", 2);
+                        urgLevels.GetElementByName(str[0]).Content = str[1];
                     }
                     else if (c1 == "glob urg value")
                     {
@@ -237,24 +146,11 @@ namespace MyApp
                 }
                 if (c == "c")
                 {
-                    Console.WriteLine("Enter task id");
-                    int id = int.Parse(Console.ReadLine());
-                    tl.GetElementAt(id).ChangeComp();
+                    tl.GetElementAt(ConsoleTask.GetTaskId()).ChangeComp();
                 }
                 if (c == "all")
                 {
-                    Console.WriteLine("\n\n\n\n\n");
-                    Console.WriteLine("All Tasks Are: ");
-                    for (int i = 0; i < tl.Tasks.Count; i++)
-                    {
-                        if (tl.IsDeleted(i))
-                        {
-                            continue;
-                        }
-                        Console.WriteLine("Task id: " + i.ToString());
-                        TaskDisplay(tl.GetElementAt(i), tags, urgLevels);
-                    }
-                    Console.WriteLine("\n\n\n\n\n");
+                    ConsoleTask.TaskListDisplay(tl, urgLevels, tags, "Your all tasks are", true);
                 }
                 XmlOperator xml1 = new XmlOperator("tasks.xml", tl);
                 XmlOperator xmlT = new XmlOperator("tags.xml", tags);
@@ -262,7 +158,7 @@ namespace MyApp
                 xmlU.UpdateData();
                 xmlT.UpdateData();
                 xml1.UpdateData();
-            }
+            }*/
         }
     }
 

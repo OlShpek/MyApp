@@ -12,13 +12,13 @@ namespace MyApp
         public ColouredItemList(List<IItem> items, string name, string tagName) : base(items, name, tagName)
         { }
 
-        public ColouredItemList(XElement el, string tagName, string id) : base(tagName, id)
+        public ColouredItemList(XElement el) : base(el)
         {
             List<XElement> els = el.Elements().ToList<XElement>();
             tasks = new List<IItem>();
             for (int i = 0; i < els.Count; i++)
             {
-                tasks.Add(new ColouredItem(els[i], els[i].Name.LocalName, els[i].Attribute("id").Value));
+                tasks.Add(new ColouredItem(els[i]));
             }
             FillBoolList(tasks.Count);
             name = el.Name.LocalName;

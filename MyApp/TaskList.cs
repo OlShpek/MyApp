@@ -12,13 +12,13 @@ namespace MyApp
     {
         public TaskList(List<IItem> tasks, string name, string tagName) : base(tasks, name, tagName)
         { }
-        public TaskList(XElement el, string id, string tagName) : base(tagName, id)
-        {
+        public TaskList(XElement el) : base(el)
+        { 
             List<XElement> els = el.Elements().ToList<XElement>();
             tasks = new List<IItem>();
             for (int i = 0; i < els.Count; i++)
             {
-                tasks.Add(new Task(els[i], els[i].Name.LocalName, els[i].Attribute("id").Value));
+                tasks.Add(new Task(els[i]));
             }
             FillBoolList(tasks.Count);
             name = el.Name.LocalName;
@@ -29,6 +29,17 @@ namespace MyApp
             return (Task)tasks[i];
         }
 
+        public Task GetElementAt(List<int> paths, int curr)
+        {
+            if (curr == paths.Count - 1)
+            {
+                return GetElementAt(paths[curr]);
+            }
+            else
+            {
+                return GetElementAt(paths[curr]).Subtasks.GetElementAt(paths, curr + 1);
+            }
+        }
         public void RemoveTags(string id)
         {
             for (int i = 0; i < tasks.Count; i++)
