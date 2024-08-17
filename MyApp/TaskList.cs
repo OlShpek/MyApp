@@ -13,7 +13,7 @@ namespace MyApp
         public TaskList(List<IItem> tasks, string name, string tagName) : base(tasks, name, tagName)
         { }
         public TaskList(XElement el) : base(el)
-        { 
+        {
             List<XElement> els = el.Elements().ToList<XElement>();
             tasks = new List<IItem>();
             for (int i = 0; i < els.Count; i++)
@@ -24,6 +24,10 @@ namespace MyApp
             name = el.Name.LocalName;
         }
 
+        public Task GetLast()
+        {
+            return (Task)tasks.Last<IItem>();
+        }
         public Task GetElementAt(int i)
         {
             return (Task)tasks[i];

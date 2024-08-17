@@ -13,11 +13,13 @@ namespace MyApp
         DateTime dueDate;
         TimeSpan expTime;
         bool completed;
+        bool changed;
         List<string> tags;
         string urg_level;
         TaskList subtasks;
         public Task(string content, DateTime dueDate, TimeSpan expTime, string tagName) : base(tagName)
         {
+            changed = false;
             this.content = content;
             this.dueDate = dueDate;
             this.expTime = expTime;
@@ -29,6 +31,7 @@ namespace MyApp
 
         public Task(XElement el) : base(el)
         {
+            changed = false;
             this.content = el.Attribute("content").Value;
             this.dueDate = DateTime.Parse(el.Attribute("dueDate").Value);
             this.expTime = TimeSpan.Parse(el.Attribute("expTime").Value);
@@ -73,6 +76,7 @@ namespace MyApp
 
         public void SpecifyTime(int h, int m, int s)
         {
+            changed = true;
             dueDate = new DateTime(dueDate.Year, dueDate.Month, dueDate.Day, h, m, s);
         }
 
@@ -92,17 +96,21 @@ namespace MyApp
 
         public void AddTag(string t)
         {
+            changed = true;
             tags.Add(t);
         }
 
         public void RemoveTag(string t)
         {
+            changed = true;
             tags.Remove(t);
         }
 
         public void AddSubTask(Task t)
         {
+            changed = true;
             subtasks.AddItem(t);
+            
         }
 
         public void RemoveSubTask(Task t)
@@ -114,9 +122,14 @@ namespace MyApp
         {
             for (int i = chPart; i < count + chPart; i++)
             {
-                Task t = new Task(mainCont + chPart.ToString(), dueDate, expTime, tagName);
+                Task t = new Task(mainCont + i.ToString(), dueDate, expTime, tagName);
                 subtasks.AddItem(t);
             }
+        }
+
+        public bool HasSubtasks()
+        {
+            return subtasks.Count != 0;
         }
         private string TagsToString()
         {
@@ -131,6 +144,7 @@ namespace MyApp
         public DateTime DueDate { get { return dueDate; } set { dueDate = value; } }
         public TimeSpan ExpTime { get { return expTime; } set { expTime = value; } }
         public string UrgencyLevel { get { return urg_level; } set { urg_level = value; } }
+        public bool Changed { get { return changed; } set { changed = value; } }
         public List<string> Tags { get { return tags; } }
         public TaskList Subtasks { get { return subtasks; } }
         public bool Completed { get { return completed; } }

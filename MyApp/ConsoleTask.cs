@@ -67,6 +67,10 @@ namespace MyApp
             {
                 Console.ForegroundColor = ConsoleColor.Red;
             }
+            if (t.HasSubtasks())
+            {
+                Console.Write("+");
+            }
             Console.Write(t.Content + " " + t.DueDate.ToString() + " " + t.ExpTime.ToString() + " ");
             ConsoleTags.DisplayULevel(t.UrgencyLevel, urglevs);
             ConsoleTags.DisplayTag(t.Tags, tags);

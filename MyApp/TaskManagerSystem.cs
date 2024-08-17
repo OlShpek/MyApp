@@ -11,7 +11,7 @@ namespace MyApp
         TaskList tl;
         ColouredItemList tags;
         ColouredItemList urgLevels;
-
+        bool local;
         public TaskManagerSystem()
         {
             XmlOperator xml = new XmlOperator("tasks.xml");
@@ -21,6 +21,15 @@ namespace MyApp
             tl = new TaskList(xml.Load("list"));
             tags = new ColouredItemList(xmlTag.Load("tagList"));
             urgLevels = new ColouredItemList(xmlUrg.Load("LevelList"));
+            local = false;
+        }
+
+        public TaskManagerSystem(TaskList tl, ColouredItemList tags, ColouredItemList urgLevels)
+        {
+            this.tl = tl;
+            this.tags = tags;
+            this.urgLevels = urgLevels;
+            local = true;
         }
 
         public void MainProcess()
@@ -51,20 +60,48 @@ namespace MyApp
                 {
                     b = true;
                 }
+                else if (command == "move")
+                {
+                    Move();
+                }
                 else if (command == "e")
                 {
                     break;
                 }
-                DataUpdate();
+                if (!local)
+                {
+                    DataUpdate();
+                }
             }
         }
 
+        private void Move()
+        {
+            string command = Console.ReadLine();
+            if (command == "to task")
+            {
+                int id = ConsoleTask.GetTaskId("To which task do you want to move?");
+                TaskManagerSystem tm = new TaskManagerSystem(tl.GetElementAt(id).Subtasks, tags, urgLevels);
+                tm.MainProcess();
+            }
+        }
         private void Addition()
         {
             string command = ConsoleTags.EnterStr("You can add further instructions", 1)[0];
             if (command == "task")
             {
                 tl.AddItem(ConsoleTask.CreateTask("You can create a task"));
+            }
+            else if (command == "subtask")
+            {
+                int id = ConsoleTask.GetTaskId("You can add a subtask to a task");
+                tl.GetElementAt(id).AddSubTask(ConsoleTask.CreateTask("Enter subtask details"));
+            }
+            else if (command == "atc subtask")
+            {
+                int id = ConsoleTask.GetTaskId("You can auto create several subtask");
+                List<string> strs = ConsoleTags.EnterStr("Enter how many subtasks, starting point and the common string", 3);
+                tl.GetElementAt(id).AutoCreate(strs[2], int.Parse(strs[0]), int.Parse(strs[1]));
             }
             else if (command == "tag")
             {
@@ -86,6 +123,7 @@ namespace MyApp
                     urgLevels.AddItem((UrgencyLevel)pair.Item1);
                 }
             }
+
         }
 
         private void Deletion()
