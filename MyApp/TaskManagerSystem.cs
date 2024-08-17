@@ -167,7 +167,7 @@ namespace MyApp
                 Console.WriteLine("You can now change the value of the urgency level; Enter the urgency level name and then its value");
                 string cont = Console.ReadLine();
                 int val = int.Parse(Console.ReadLine());
-                UrgencyLevel ul = (UrgencyLevel)urgLevels.GetElementByName(cont);
+                UrgencyLevel ul = (UrgencyLevel)(urgLevels.GetElementByName(cont));
                 ul.ULevel = val;
             }
         }

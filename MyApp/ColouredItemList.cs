@@ -18,7 +18,14 @@ namespace MyApp
             tasks = new List<IItem>();
             for (int i = 0; i < els.Count; i++)
             {
-                tasks.Add(new ColouredItem(els[i]));
+                if (els[i].Attribute("uLevel") != null)
+                {
+                    tasks.Add(new UrgencyLevel(els[i]));
+                }
+                else 
+                {
+                    tasks.Add(new ColouredItem(els[i]));
+                }
             }
             FillBoolList(tasks.Count);
             name = el.Name.LocalName;
