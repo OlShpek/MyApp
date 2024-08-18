@@ -123,9 +123,41 @@ namespace MyApp
                     urgLevels.AddItem((UrgencyLevel)pair.Item1);
                 }
             }
+            else if (command == "to all")
+            {
+                AddToAll();
+            }
 
         }
 
+        private void AddToAll()
+        {
+            string command = Console.ReadLine();
+            if (command == "tag")
+            {
+                Tuple<ColouredItem, bool> tg = CreateTag(command, tags);
+                if (!tg.Item2)
+                {
+                    tags.AddItem(tg.Item1);
+                }
+                for (int i = 0; i < tl.Count; i++)
+                {
+                    tl.GetElementAt(i).AddTag(tg.Item1.Id);
+                }
+            }
+            else if (command == "urgency level")
+            {
+                Tuple<ColouredItem, bool> ul = CreateTag(command, urgLevels);
+                if (!ul.Item2)
+                {
+                    urgLevels.AddItem(ul.Item1);
+                }
+                for (int i = 0; i < tl.Count; i++)
+                {
+                    tl.GetElementAt(i).UrgencyLevel = ul.Item1.Id;
+                }
+            }
+        }
         private void Deletion()
         {
             string c1 = Console.ReadLine();
