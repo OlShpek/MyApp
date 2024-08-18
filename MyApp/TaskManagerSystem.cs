@@ -64,6 +64,10 @@ namespace MyApp
                 {
                     Move();
                 }
+                else if (command == "sort")
+                {
+                    Sort();
+                }
                 else if (command == "e")
                 {
                     break;
@@ -75,6 +79,29 @@ namespace MyApp
             }
         }
 
+        private void Sort()
+        {
+            Console.WriteLine("To return back press e");
+            string command = Console.ReadLine();
+            if (command == "by duedate")
+            {
+                TaskManagerSystem tm = new TaskManagerSystem(tl.Sort(), tags, urgLevels);
+                tm.MainProcess();
+                tl = tm.TL;
+            }
+            else if (command == "by exp time")
+            {
+                TaskManagerSystem tm = new TaskManagerSystem(tl.SortByTimeSpan(), tags, urgLevels);
+                tm.MainProcess();
+                tl = tm.TL;
+            }
+            else if (command == "by urg level")
+            {
+                TaskManagerSystem tm = new TaskManagerSystem(tl.SortByUrgLevel(urgLevels), tags, urgLevels);
+                tm.MainProcess();
+                tl = tm.TL;
+            }
+        }
         private void Move()
         {
             string command = Console.ReadLine();
@@ -310,5 +337,7 @@ namespace MyApp
             xmlT.UpdateData();
             xml1.UpdateData();
         }
+
+        public TaskList TL { set { tl = value; } get { return tl; } }
     }
 }

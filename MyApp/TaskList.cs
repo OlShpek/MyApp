@@ -62,5 +62,63 @@ namespace MyApp
                 }
             }
         }
+
+        public TaskList Sort()
+        {
+            List<Task> nl = ConvertToListTask();
+            nl.Sort(delegate (Task t1, Task t2) 
+            {
+                return t1.DueDate.CompareTo(t2.DueDate);
+            });
+            TaskList tl = new TaskList(nl.Cast<IItem>().ToList<IItem>(), name, tagName);
+            return tl;
+        }
+
+        public TaskList SortByTimeSpan()
+        {
+            List<Task> nl = ConvertToListTask();
+            nl.Sort(delegate (Task t1, Task t2) { return t1.ExpTime.CompareTo(t2.ExpTime); });
+            return new TaskList(nl.Cast<IItem>().ToList<IItem>(), name, tagName);
+        }
+
+        public TaskList SortByUrgLevel(ColouredItemList urgLevels)
+        {
+            List<Task> nl = ConvertToListTask();
+            nl.Sort(delegate (Task t1, Task t2)
+            {
+                int U1, U2;
+                if (t1.UrgencyLevel == "0")
+                {
+                    U1 = 0;
+                }
+                else
+                {
+                    UrgencyLevel u1 = (UrgencyLevel)urgLevels.GetItemById(t1.UrgencyLevel);
+                    U1 = u1.ULevel;
+                }
+
+                if (t2.UrgencyLevel == "0")
+                {
+                    U2 = 0;
+                }
+                else
+                {
+                    UrgencyLevel u2 = (UrgencyLevel)urgLevels.GetItemById(t2.UrgencyLevel);
+                    U2 = u2.ULevel;
+                }
+                return U2.CompareTo(U1);
+            });
+            return new TaskList(nl.Cast<IItem>().ToList<IItem>(), name, tagName);
+        }
+
+        private List<Task> ConvertToListTask()
+        {
+            List<Task> conv = new List<Task>();
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                conv.Add((Task)tasks[i]);
+            }
+            return conv;
+        }
     }
 }
