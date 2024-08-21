@@ -24,10 +24,6 @@ namespace MyApp
             name = el.Name.LocalName;
         }
 
-        public Task GetLast()
-        {
-            return (Task)tasks.Last<IItem>();
-        }
         public Task GetElementAt(int i)
         {
             return (Task)tasks[i];
@@ -111,6 +107,70 @@ namespace MyApp
             return new TaskList(nl.Cast<IItem>().ToList<IItem>(), name, tagName);
         }
 
+        public List<IItem> GetAll()
+        {
+            List<IItem> fullList = new List<IItem>();
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                fullList.Add(tasks[i]);
+                if (GetElementAt(i).HasSubtasks())
+                {
+                    fullList.AddRange(GetElementAt(i).Subtasks.GetAll());
+                }
+            }
+            return fullList;
+        }
+
+        public List<IItem> GetAllByTag(string id)
+        {
+            List<IItem> fullList = new List<IItem>();
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                if (GetElementAt(i).HasTag(id))
+                {
+                    fullList.Add(tasks[i]);
+                }
+                if (GetElementAt(i).HasSubtasks())
+                {
+                    fullList.AddRange(GetElementAt(i).Subtasks.GetAllByTag(id));
+                }
+            }
+            return fullList;
+        }
+
+        public List<IItem> GetAllByUrgencyLevel(string id)
+        {
+            List<IItem> fullList = new List<IItem>();
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                if (GetElementAt(i).UrgencyLevel == id)
+                {
+                    fullList.Add(tasks[i]);
+                }
+                if (GetElementAt(i).HasSubtasks())
+                {
+                    fullList.AddRange(GetElementAt(i).Subtasks.GetAllByUrgencyLevel(id));
+                }
+            }
+            return fullList;
+        }
+
+        public List<IItem> GetAllByDueDate(DateTime due)
+        {
+            List<IItem> fullList = new List<IItem>();
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                if (GetElementAt(i).EqualDueDate(due))
+                {
+                    fullList.Add(tasks[i]);
+                }
+                if (GetElementAt(i).HasSubtasks())
+                {
+                    fullList.AddRange(GetElementAt(i).Subtasks.GetAllByDueDate(due));
+                }
+            }
+            return fullList;
+        }
         private List<Task> ConvertToListTask()
         {
             List<Task> conv = new List<Task>();

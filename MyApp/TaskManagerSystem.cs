@@ -12,6 +12,7 @@ namespace MyApp
         ColouredItemList tags;
         ColouredItemList urgLevels;
         bool local;
+        bool filtered;
         public TaskManagerSystem()
         {
             XmlOperator xml = new XmlOperator("tasks.xml");
@@ -22,14 +23,16 @@ namespace MyApp
             tags = new ColouredItemList(xmlTag.Load("tagList"));
             urgLevels = new ColouredItemList(xmlUrg.Load("LevelList"));
             local = false;
+            filtered = false;
         }
 
-        public TaskManagerSystem(TaskList tl, ColouredItemList tags, ColouredItemList urgLevels)
+        public TaskManagerSystem(TaskList tl, ColouredItemList tags, ColouredItemList urgLevels, bool filtered)
         {
             this.tl = tl;
             this.tags = tags;
             this.urgLevels = urgLevels;
             local = true;
+            this.filtered = filtered;
         }
 
         public void MainProcess()
@@ -64,6 +67,10 @@ namespace MyApp
                 {
                     Move();
                 }
+                else if (command == "get")
+                {
+                    Get();
+                }
                 else if (command == "sort")
                 {
                     Sort();
@@ -79,25 +86,57 @@ namespace MyApp
             }
         }
 
+        private void Get()
+        {
+            Console.WriteLine("You cannot add tasks in this mode; press e to exit");
+            string command = Console.ReadLine();
+            if (command == "all")
+            {
+                StartFilMain(tl.GetAll());
+            }
+            else if (command == "by duedate")
+            {
+                DateTime dt = ConsoleTask.EnterDate();
+                Console.WriteLine(dt);
+                StartFilMain(tl.GetAllByDueDate(dt));
+            }
+            else if (command == "by tag")
+            {
+                string s = ConsoleTags.EnterStr("Please enter tag name", 1)[0];
+                StartFilMain(tl.GetAllByTag(tags.GetElementByName(s).Id));
+            }
+            else if (command == "by urg level")
+            {
+                string s = ConsoleTags.EnterStr("Please enter urgency level name", 1)[0];
+                StartFilMain(tl.GetAllByUrgencyLevel(urgLevels.GetElementByName(s).Id));
+            }
+        }
+
+        private void StartFilMain(List<IItem> l)
+        {
+            TaskList ftl = new TaskList(l, tl.Name, tl.TagName);
+            TaskManagerSystem tm = new TaskManagerSystem(ftl, tags, urgLevels, true);
+            tm.MainProcess();
+        }
         private void Sort()
         {
             Console.WriteLine("To return back press e");
             string command = Console.ReadLine();
             if (command == "by duedate")
             {
-                TaskManagerSystem tm = new TaskManagerSystem(tl.Sort(), tags, urgLevels);
+                TaskManagerSystem tm = new TaskManagerSystem(tl.Sort(), tags, urgLevels, filtered);
                 tm.MainProcess();
                 tl = tm.TL;
             }
             else if (command == "by exp time")
             {
-                TaskManagerSystem tm = new TaskManagerSystem(tl.SortByTimeSpan(), tags, urgLevels);
+                TaskManagerSystem tm = new TaskManagerSystem(tl.SortByTimeSpan(), tags, urgLevels, filtered);
                 tm.MainProcess();
                 tl = tm.TL;
             }
             else if (command == "by urg level")
             {
-                TaskManagerSystem tm = new TaskManagerSystem(tl.SortByUrgLevel(urgLevels), tags, urgLevels);
+                TaskManagerSystem tm = new TaskManagerSystem(tl.SortByUrgLevel(urgLevels), tags, urgLevels, filtered);
                 tm.MainProcess();
                 tl = tm.TL;
             }
@@ -108,14 +147,14 @@ namespace MyApp
             if (command == "to task")
             {
                 int id = ConsoleTask.GetTaskId("To which task do you want to move?");
-                TaskManagerSystem tm = new TaskManagerSystem(tl.GetElementAt(id).Subtasks, tags, urgLevels);
+                TaskManagerSystem tm = new TaskManagerSystem(tl.GetElementAt(id).Subtasks, tags, urgLevels, filtered);
                 tm.MainProcess();
             }
         }
         private void Addition()
         {
             string command = ConsoleTags.EnterStr("You can add further instructions", 1)[0];
-            if (command == "task")
+            if (command == "task" && !filtered)
             {
                 tl.AddItem(ConsoleTask.CreateTask("You can create a task"));
             }

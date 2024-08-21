@@ -100,6 +100,17 @@ namespace MyApp
             tags.Add(t);
         }
 
+        public bool HasTag(string t)
+        {
+            for (int i = 0; i < tags.Count; i++)
+            {
+                if (tags[i] == t)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public void RemoveTag(string t)
         {
             changed = true;
@@ -139,6 +150,11 @@ namespace MyApp
         public void ChangeComp()
         {
             completed = !completed;
+        }
+
+        public bool EqualDueDate(DateTime dt)
+        {
+            return dueDate.Day == dt.Day && dueDate.Month == dt.Month && dueDate.Year == dt.Year;
         }
         public string Content { get { return content; }  set { content = value; } }
         public DateTime DueDate { get { return dueDate; } set { dueDate = value; } }
