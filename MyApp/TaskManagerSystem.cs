@@ -37,6 +37,8 @@ namespace MyApp
 
         public void MainProcess()
         {
+            TaskList ftl = new TaskList(tl.GetAllByDueDate(DateTime.Now), "nme", "list");
+            ConsoleCalendar.DisplayCalendarDay(new Date(DateTime.Now, new List<IItem>(), ftl, "day", "date"));
             bool b = false;
             while (true)
             {
@@ -153,8 +155,12 @@ namespace MyApp
         }
         private void Addition()
         {
+            if (filtered)
+            {
+                return;
+            }
             string command = ConsoleTags.EnterStr("You can add further instructions", 1)[0];
-            if (command == "task" && !filtered)
+            if (command == "task")
             {
                 tl.AddItem(ConsoleTask.CreateTask("You can create a task"));
             }
