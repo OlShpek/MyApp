@@ -59,6 +59,22 @@ namespace MyApp
             }
         }
 
+        public bool RemoveTask(string id)
+        {
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                if (tasks[i].Id == id)
+                {
+                    deleted[i] = true;
+                    return true;
+                }
+                if (GetElementAt(i).Subtasks.RemoveTask(id))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public TaskList Sort()
         {
             List<Task> nl = ConvertToListTask();

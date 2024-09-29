@@ -152,6 +152,43 @@ namespace MyApp
                 TaskManagerSystem tm = new TaskManagerSystem(tl.GetElementAt(id).Subtasks, tags, urgLevels, filtered);
                 tm.MainProcess();
             }
+            else if (command == "from/to task")
+            {
+                Console.WriteLine("You can only move around tasks within the common space; Go up if they are not");
+                Console.WriteLine("Plese select the task you want to move");
+                Task ch = SelectTask(tl);
+                Console.WriteLine("Please select the task you want to move it to");
+                Task par = SelectTask(tl);
+                par.AddSubTask(ch);
+                tl.RemoveTask(ch.Id);
+            }
+            else if (command == "glob")
+            {
+                Console.WriteLine("You can move the task to the most outter level");
+                Task ch = SelectTask(tl);
+                tl.RemoveTask(ch.Id);
+                tl.AddItem(ch);
+            }
+        }
+
+        private Task SelectTask(TaskList currentTL)
+        {
+            ConsoleTask.TaskListDisplay(currentTL, urgLevels, tags, "", true);
+            while (true)
+            {
+                Console.WriteLine("Write a command move/select");
+                string command = Console.ReadLine();
+                if (command == "move")
+                {
+                    int id = ConsoleTask.GetTaskId();
+                    return SelectTask(currentTL.GetElementAt(id).Subtasks);
+                }
+                else if (command == "select")
+                {
+                    int id = ConsoleTask.GetTaskId();
+                    return currentTL.GetElementAt(id);
+                }
+            }
         }
         private void Addition()
         {
